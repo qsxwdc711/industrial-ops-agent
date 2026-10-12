@@ -56,14 +56,35 @@ class Knowledge:
                 await self.index(doc['id'])
 
     async def embeddings(self, texts: list[str]) -> list[list[float]]:
-        async with httpx.AsyncClient(timeout=60) as client:
-            response = await client.post(self.settings.ark_base_url.rstrip('/') + '/embeddings',
-                headers={'Authorization': 'Bearer ' + self.settings.ark_api_key.get_secret_value()},
-                json={'model': self.settings.ark_embedding_model, 'input': texts, 'encoding_format': 'float'})
-            if response.is_error:
-                raise ValueError(f'嵌入模型调用失败（HTTP {response.status_code}），请检查模型权限与配置')
-            data = sorted(response.json()['data'], key=lambda item: item['index'])
-            vectors = [item['embedding'] for item in data]
+        if not texts:
+            return []
+        api = self.settings.ark_embedding_api
+        multimodal = api == 'multimodal' or (
+            api == 'auto' and self.settings.ark_embedding_model.startswith('doubao-embedding-vision'))
+        async with httpx.AsyncClient(timeout=60, trust_env=False) as client:
+            async def request(endpoint, payload):
+                response = await client.post(self.settings.ark_base_url.rstrip('/') + endpoint,
+                    headers={'Authorization': 'Bearer ' + self.settings.ark_api_key.get_secret_value()},
+                    json={'model': self.settings.ark_embedding_model, 'encoding_format': 'float', **payload})
+                if response.is_error:
+                    raise ValueError(f'嵌入模型调用失败（HTTP {response.status_code}），请检查模型权限与配置')
+                return response.json()['data']
+
+            if multimodal:
+                # Multimodal input items form ONE vector, so each chunk needs its own request.
+                semaphore = asyncio.Semaphore(4)
+
+                async def embed_text(text):
+                    async with semaphore:
+                        data = await request('/embeddings/multimodal', {
+                            'input': [{'type': 'text', 'text': text}],
+                            'dimensions': self.settings.embedding_dimension})
+                        return data['embedding']
+
+                vectors = await asyncio.gather(*(embed_text(text) for text in texts))
+            else:
+                data = await request('/embeddings', {'input': texts})
+                vectors = [item['embedding'] for item in sorted(data, key=lambda item: item['index'])]
             if len(vectors) != len(texts) or any(len(v) != self.settings.embedding_dimension for v in vectors):
                 raise ValueError('嵌入模型返回数量或向量维度不匹配')
             return vectors

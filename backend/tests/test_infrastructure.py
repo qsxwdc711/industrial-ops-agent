@@ -17,7 +17,8 @@ from app.storage import Storage
 def test_mysql_96_shards_redis_and_optional_rabbitmq():
     settings = Settings(_env_file=None, database_url='mysql+pymysql://industrial:industrial@localhost:3316/industrial?charset=utf8mb4',
         shard_count=96, demo_seed=False, queue_backend=os.getenv('INFRA_QUEUE_BACKEND', 'local'),
-        rabbitmq_url='amqp://industrial:industrial@localhost:5673/', cache_backend='redis',
+        rabbitmq_url='amqp://industrial:industrial@localhost:5673/',
+        rabbitmq_queue='industrial.test.' + uuid4().hex, cache_backend='redis',
         redis_url='redis://localhost:6381/15', mcp_transport='stdio', aggregate_interval=3600)
     device_id = 'T-' + uuid4().hex[:8]
     storage = None
@@ -55,6 +56,14 @@ def test_mysql_96_shards_redis_and_optional_rabbitmq():
                 conn.execute(storage.aggregates.delete().where(storage.aggregates.c.device_id == device_id))
                 conn.execute(storage.devices.delete().where(storage.devices.c.id == device_id))
             storage.engine.dispose()
+        if settings.queue_backend == 'rabbitmq':
+            async def remove_test_queue():
+                import aio_pika
+                connection = await aio_pika.connect_robust(settings.rabbitmq_url, timeout=10)
+                async with connection:
+                    channel = await connection.channel()
+                    await channel.queue_delete(settings.rabbitmq_queue, if_unused=True, if_empty=True)
+            asyncio.run(remove_test_queue())
 
 
 def test_inbox_replay_after_restart(tmp_path):

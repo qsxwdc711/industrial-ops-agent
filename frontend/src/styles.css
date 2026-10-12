@@ -1437,6 +1437,56 @@ tbody tr:hover {
   color: #66796c;
   overflow-wrap: anywhere;
 }
+.report-markdown {
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.85;
+}
+.report-markdown p {
+  margin: 0 0 12px;
+}
+.report-markdown :is(h1, h2, h3, h4, h5, h6) {
+  color: #294b3f;
+  font-size: 14px;
+  margin: 20px 0 10px;
+}
+.report-markdown > :first-child {
+  margin-top: 0;
+}
+.report-markdown :is(ul, ol) {
+  padding-left: 22px;
+  margin: 10px 0 14px;
+}
+.report-markdown li {
+  margin: 5px 0;
+}
+.report-markdown strong {
+  color: #365a49;
+}
+.report-markdown a {
+  color: #16745c;
+  text-decoration: underline;
+}
+.report-markdown :is(pre, table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.report-markdown :is(th, td) {
+  padding: 7px 9px;
+  border: 1px solid #e4ece6;
+}
+.report-markdown blockquote {
+  border-left: 3px solid #c4dccb;
+  padding-left: 12px;
+  margin: 12px 0;
+}
+.report-markdown hr {
+  border: 0;
+  border-top: 1px solid #e4ece6;
+  margin: 18px 0;
+}
 .user .message-content {
   color: #768695;
   background: #f6f8fa;

@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     demo_seed: bool = True
     queue_backend: Literal['local', 'rabbitmq'] = 'local'
     rabbitmq_url: str = 'amqp://industrial:industrial@localhost:5672/'
+    rabbitmq_queue: str = Field(default='industrial.telemetry', min_length=1, max_length=200)
     cache_backend: Literal['memory', 'redis'] = 'memory'
     redis_url: str = 'redis://localhost:6379/0'
     llm_mode: Literal['demo', 'ark'] = 'demo'
@@ -24,6 +25,7 @@ class Settings(BaseSettings):
     ark_model: str = ''
     ark_base_url: str = 'https://ark.cn-beijing.volces.com/api/v3'
     ark_embedding_model: str = ''
+    ark_embedding_api: Literal['auto', 'text', 'multimodal'] = 'auto'
     embedding_dimension: int = Field(default=1024, ge=8, le=8192)
     knowledge_backend: Literal['local', 'milvus'] = 'local'
     milvus_uri: str = 'http://localhost:19530'

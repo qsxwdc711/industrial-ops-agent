@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Activity,
   ArrowDownToLine,
@@ -1346,7 +1348,20 @@ export default function App() {
                                 )}
                               </div>
                               <div className="message-content">
-                                {message.content}
+                                {message.role === "assistant" &&
+                                message.mode === "ark" ? (
+                                  <div className="report-markdown">
+                                    <Markdown
+                                      remarkPlugins={[remarkGfm]}
+                                      skipHtml
+                                      disallowedElements={["img"]}
+                                    >
+                                      {message.content}
+                                    </Markdown>
+                                  </div>
+                                ) : (
+                                  message.content
+                                )}
                               </div>
                               {message.evidence?.length ? (
                                 <details className="evidence-details">

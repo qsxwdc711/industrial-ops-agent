@@ -12,6 +12,9 @@ const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 await mkdir("test-results", { recursive: true });
 try {
+  const health = await (
+    await context.request.get("http://127.0.0.1:8000/api/health")
+  ).json();
   await page.goto("http://127.0.0.1:5173");
   await page.getByText("设备数据已同步", { exact: true }).waitFor();
   await page.screenshot({ path: "test-results/overview.png", fullPage: true });
@@ -71,18 +74,40 @@ try {
     })
     .click();
   await page
-    .getByText("此结果来自本地规则演示，未调用大语言模型。", { exact: false })
-    .waitFor({ timeout: 60_000 });
-  await page.getByText("查看分析证据 · 4 次工具查询").click();
+    .locator(".evidence-details summary")
+    .first()
+    .waitFor({ timeout: 180_000 });
+  const firstReport = page
+    .locator(".chat-message.assistant .message-content")
+    .first();
+  if ((await firstReport.innerText()).length < 50)
+    throw new Error("Diagnosis report is empty");
+  if (health.llm_mode === "ark") {
+    await page.getByText("方舟模型分析", { exact: true }).waitFor();
+    if ((await firstReport.innerText()).includes("此结果来自本地规则演示")) {
+      throw new Error("Ark mode unexpectedly returned a demo report");
+    }
+  }
+  await page.locator(".evidence-details summary").first().click();
   await page.screenshot({ path: "test-results/assistant.png", fullPage: true });
   await page
     .getByPlaceholder("描述你对 P-101 的问题，Enter 发送，Shift + Enter 换行")
     .fill("继续整理人工巡检建议");
   await page.getByRole("button", { name: "发送问题" }).click();
   await page
-    .getByText("此结果来自本地规则演示，未调用大语言模型。", { exact: false })
+    .locator(".evidence-details summary")
     .nth(1)
-    .waitFor({ timeout: 60_000 });
+    .waitFor({ timeout: 180_000 });
+  if (
+    (
+      await page
+        .locator(".chat-message.assistant .message-content")
+        .nth(1)
+        .innerText()
+    ).length < 50
+  ) {
+    throw new Error("Follow-up report is empty");
+  }
   await page.setViewportSize({ width: 390, height: 844 });
   await page
     .getByRole("navigation")

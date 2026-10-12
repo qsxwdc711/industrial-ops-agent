@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 30
   rabbitmq:
-    image: rabbitmq:4.1-management-alpine
+    image: ${RABBITMQ_IMAGE:-rabbitmq:4.1-management-alpine}
     environment:
       RABBITMQ_DEFAULT_USER: industrial
       RABBITMQ_DEFAULT_PASS: industrial
@@ -80,6 +80,7 @@ services:
       DEMO_SEED: ${DEMO_SEED:-true}
       QUEUE_BACKEND: rabbitmq
       RABBITMQ_URL: amqp://industrial:industrial@rabbitmq:5672/
+      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-industrial.telemetry}
       CACHE_BACKEND: redis
       REDIS_URL: redis://redis:6379/0
       KNOWLEDGE_BACKEND: ${KNOWLEDGE_BACKEND:-local}
@@ -91,6 +92,7 @@ services:
       ARK_MODEL: ${ARK_MODEL:-}
       ARK_BASE_URL: ${ARK_BASE_URL:-https://ark.cn-beijing.volces.com/api/v3}
       ARK_EMBEDDING_MODEL: ${ARK_EMBEDDING_MODEL:-}
+      ARK_EMBEDDING_API: ${ARK_EMBEDDING_API:-auto}
       EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-1024}
     ports: ["127.0.0.1:8000:8000"]
     depends_on:

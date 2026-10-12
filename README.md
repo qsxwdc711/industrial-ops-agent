@@ -85,6 +85,26 @@ REDIS_URL=redis://localhost:6381/0
 
 RabbitMQ 管理界面位于 [本地管理界面](http://127.0.0.1:15673)，开发账号为 `industrial / industrial`。Compose 创建独立的项目服务和数据卷，不复用电脑上已有的数据库。开发密码仅用于本机原型。
 
+### RabbitMQ 镜像下载失败时
+
+Compose 支持通过 `RABBITMQ_IMAGE` 单独替换 RabbitMQ 镜像源。使用 [DaoCloud 公共镜像服务](https://github.com/DaoCloud/public-image-mirror)：
+
+```powershell
+$env:RABBITMQ_IMAGE='m.daocloud.io/docker.io/library/rabbitmq:4.1-management-alpine'
+docker compose up -d rabbitmq
+```
+
+如果主机能访问镜像源，但 Docker Desktop 下载仍出现 EOF 或 TLS 超时，可以用本项目脚本从主机下载固定的 Linux amd64 镜像清单和镜像层，校验 SHA256 后导入：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\download_rabbitmq.py
+docker load --input backend\data\rabbitmq-image\rabbitmq.tar
+Remove-Item Env:RABBITMQ_IMAGE -ErrorAction SilentlyContinue
+docker compose up -d --pull never rabbitmq
+```
+
+脚本支持镜像层断点续传，下载文件位于已忽略的 `backend/data`。它不修改 Docker 的全局镜像源配置。固定的镜像清单与平台见脚本；升级 RabbitMQ 或在其他架构运行时需重新选择并核验清单。
+
 完整容器运行：
 
 ```powershell
@@ -108,11 +128,14 @@ KNOWLEDGE_BACKEND=milvus
 MILVUS_URI=http://localhost:19531
 MILVUS_TOKEN=
 ARK_API_KEY=在本机填写你的方舟APIKey
-ARK_EMBEDDING_MODEL=支持文本embeddings接口的模型ID或接入点ID
+ARK_EMBEDDING_MODEL=嵌入模型的ModelID或EndpointID
+ARK_EMBEDDING_API=auto
 EMBEDDING_DIMENSION=模型实际返回的维度
 ```
 
-嵌入模型与聊天模型分别配置。本适配器调用 `/embeddings`，模型必须支持该文本接口；多模态专用嵌入接口需要单独适配。启用 Milvus 身份验证时填 `MILVUS_TOKEN`。向量维度与已有集合不一致时启动失败。切换到 Milvus 时会重新索引已有文档，并可能产生嵌入 API 费用。索引失败保留原文并显示失败状态，可在前端重新索引。
+嵌入模型与聊天模型分别配置。`auto` 自动识别 `doubao-embedding-vision` Model ID，使用 [多模态向量化接口](https://docs.volcengine.com/docs/ark/multimodal-vectorization-api?lang=zh)；其余默认调用 `/embeddings`。多模态模型使用 Endpoint ID 时，需要显式配置 `ARK_EMBEDDING_API=multimodal`。多模态接口每个文档切片分别请求一个向量，最多四个请求并发，并指定 `EMBEDDING_DIMENSION`（1024 或 2048）。也可以设为 `text` 强制使用文本接口。嵌入和本地 Milvus HTTP 请求直接连接服务，避免系统代理干扰。
+
+启用 Milvus 身份验证时填 `MILVUS_TOKEN`。向量维度与已有集合不一致时启动失败。切换到 Milvus时及重启后端时会重新索引已有文档，并可能产生嵌入 API 费用。索引失败保留原文并显示失败状态，可在前端重新索引。
 
 容器模式还需在根目录 `.env` 设置相关变量，并同时启用 `app`、`vector` 两个 profile。
 
@@ -165,7 +188,15 @@ Set-Location ..
 
 基础设施测试为显式启用：后端目录设置 `$env:RUN_INFRA_TESTS='1'` 可验证 MySQL/Redis，设置 `$env:INFRA_QUEUE_BACKEND='rabbitmq'` 后追加真实 RabbitMQ 验证；设置 `$env:RUN_MILVUS_TESTS='1'` 可验证真实 Milvus 的索引、检索、引用与删除。Milvus 测试使用受控测试向量，不调用或验证方舟嵌入模型效果。
 
+RabbitMQ 默认队列是 `industrial.telemetry`，可用 `RABBITMQ_QUEUE` 修改。不同数据库实例应使用不同队列，避免消费者分走其他实例的数据。基础设施测试使用随机命名队列，完成后只删除自己的测试队列。
+
 测试替身可验证方舟调用流程和工具反馈，不能证明真实 API 权限或模型效果。50ms 是指定查询场景的优化目标，本地小样本测量不代表亿级数据上的性能。分片数持久化后不能直接改，否则会改变路由；需要设计并验证迁移过程。当前接入管线按单后端进程运行，使用多进程前需要实现收件箱的数据库抢占、任务租约和跨进程协调。当前前端用于本机开发，未实现多用户登录与权限管理。
+
+浏览器测试会使用当前后端配置。在 `LLM_MODE=ark`、`KNOWLEDGE_BACKEND=milvus` 下，它会发起真实诊断、追问、文档嵌入和检索调用；离线验证请使用演示模式。真实服务验证结果记录于验证文档，不以测试替身结果代替。
+
+## 后续站点部署
+
+当前先完成本地联调。后续可以把完整 Docker 服务部署到云服务器，通过反向代理、域名和 HTTPS 访问；需要补齐登录权限及生产配置。如果选择 Codex Sites，可以托管 React 前端，Python API、RabbitMQ、MySQL、Redis 和 Milvus 继续部署在独立后端服务器上，再通过 HTTPS API 接入。方舟密钥始终保存在后端环境变量中。
 
 ## 阅读代码的顺序
 

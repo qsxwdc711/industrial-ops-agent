@@ -42,4 +42,4 @@
 - [x] 新建 README、环境变量示例、Dockerfiles、Compose、Windows 启动脚本、性能测试脚本。
 - [x] 验证 `docker compose config --quiet`；记录依赖锁与测试结果，说明外部模型和向量检索的凭据要求。
 
-完整验证结果见 `docs/verification-2026-10-12.md`。RabbitMQ 适配器已实现，但镜像下载失败，实际联调仍需完成；真实方舟与嵌入模型调用需配置个人凭据。
+完整验证结果见 `docs/verification-2026-10-12.md`。用户完成个人凭据配置后，真实方舟诊断、追问和多模态嵌入检索均已联调通过；RabbitMQ 经 DaoCloud 镜像下载、SHA256 校验及导入后，真实采样入库验证通过。本机工作台使用 RabbitMQ、Redis、Milvus 与 MCP stdio，保留原 SQLite 会话和 16 分片；MySQL 96 分表通过独立集成测试。用户选择先完成本地联调，部署方案后续决定。

@@ -34,7 +34,7 @@ class Pipeline:
             self.connection = await aio_pika.connect_robust(self.storage.settings.rabbitmq_url, timeout=10)
             self.channel = await self.connection.channel(publisher_confirms=True)
             await self.channel.set_qos(prefetch_count=32)
-            self.broker_queue = await self.channel.declare_queue('industrial.telemetry', durable=True)
+            self.broker_queue = await self.channel.declare_queue(self.storage.settings.rabbitmq_queue, durable=True)
             self.consumer_tag = await self.broker_queue.consume(self.consume)
         self.tasks = [asyncio.create_task(self.parse(), name='parse-worker'),
                       asyncio.create_task(self.compute(), name='calculation-worker'),
@@ -74,7 +74,7 @@ class Pipeline:
                         await self.channel.default_exchange.publish(aio_pika.Message(
                             json.dumps(record['payload']).encode(),
                             delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
-                            message_id=event_id), routing_key='industrial.telemetry')
+                            message_id=event_id), routing_key=self.storage.settings.rabbitmq_queue)
                     else:
                         future = asyncio.get_running_loop().create_future()
                         await self.raw.put((record['payload'], future))
