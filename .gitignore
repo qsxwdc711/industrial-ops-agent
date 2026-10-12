@@ -9,5 +9,6 @@ backend/data/
 node_modules/
 frontend/dist/
 frontend/test-results/
+*.tsbuildinfo
 *.log
 .DS_Store
