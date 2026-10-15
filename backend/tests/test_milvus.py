@@ -95,10 +95,12 @@ def test_multimodal_chunks_are_embedded_separately(tmp_path, monkeypatch, model,
         storage.engine.dispose()
 
 
-def test_embedding_http_contract_and_dimension_check(tmp_path, monkeypatch):
+@pytest.mark.parametrize('trust_env', [False, True])
+def test_embedding_http_contract_and_dimension_check(tmp_path, monkeypatch, trust_env):
     settings = Settings(_env_file=None,
         database_url=f'sqlite:///{(tmp_path / "embedding.db").as_posix()}',
-        ark_api_key=SecretStr('test-only'), ark_embedding_model='embedding-test', embedding_dimension=8)
+        ark_api_key=SecretStr('test-only'), ark_embedding_model='embedding-test', embedding_dimension=8,
+        ark_trust_env=trust_env)
     storage = Storage(settings)
     knowledge = Knowledge(storage)
     actual_client = httpx.AsyncClient
@@ -113,6 +115,7 @@ def test_embedding_http_contract_and_dimension_check(tmp_path, monkeypatch):
                                               for i, _ in enumerate(payload['input'])]})
 
     def mock_client(**kwargs):
+        assert kwargs['trust_env'] is trust_env
         return actual_client(transport=httpx.MockTransport(handler), **kwargs)
 
     monkeypatch.setattr('app.knowledge.httpx.AsyncClient', mock_client)

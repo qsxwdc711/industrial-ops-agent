@@ -4,6 +4,7 @@ import logging
 from contextlib import asynccontextmanager
 from time import perf_counter
 
+import httpx
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -35,8 +36,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         storage = Storage(config)
         cache, knowledge = Cache(config), Knowledge(storage)
         pipeline = Pipeline(storage, cache)
+        model_http = httpx.AsyncClient(timeout=45, trust_env=config.ark_trust_env) if config.llm_mode == 'ark' else None
         app.state.storage, app.state.knowledge = storage, knowledge
         app.state.pipeline, app.state.cache = pipeline, cache
+        app.state.model_http = model_http
         app.state.analysis_slots = asyncio.Semaphore(2)
         try:
             await asyncio.to_thread(storage.initialize)
@@ -47,6 +50,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await pipeline.start()
             yield
         finally:
+            if model_http is not None:
+                await model_http.aclose()
             await pipeline.close()
             await knowledge.close()
             await cache.close()
@@ -237,7 +242,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 try:
                     async with asyncio.timeout(180):
                         async with Tools(app.state.storage, app.state.knowledge).connected() as tools:
-                            graph = build_graph(config, tools)
+                            graph = build_graph(config, tools, http_async_client=app.state.model_http)
                             initial = {'question': item.question, 'device_id': item.device_id, 'history': history}
                             async for mode, update in graph.astream(initial, stream_mode=['custom', 'updates'],
                                                                    config={'recursion_limit': 40}):

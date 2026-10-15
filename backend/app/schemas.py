@@ -46,6 +46,14 @@ class LogInput(BaseModel):
     level: Literal['info', 'warning', 'error'] = 'info'
     message: str = Field(min_length=2, max_length=500)
 
+    @field_validator('message')
+    @classmethod
+    def nonblank(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 2:
+            raise ValueError('日志至少需要两个有效字符')
+        return value
+
 
 class DocumentInput(BaseModel):
     title: str = Field(min_length=2, max_length=160)
@@ -65,3 +73,11 @@ class AnalysisInput(BaseModel):
     question: str = Field(min_length=2, max_length=2000)
     device_id: str = Field(pattern=r'^[A-Za-z0-9_-]{1,32}$')
     session_id: str | None = Field(default=None, pattern=r'^[a-f0-9-]{36}$')
+
+    @field_validator('question')
+    @classmethod
+    def nonblank(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 2:
+            raise ValueError('问题至少需要两个有效字符')
+        return value

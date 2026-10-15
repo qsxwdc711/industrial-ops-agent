@@ -1,6 +1,7 @@
 import json
 from typing import Literal, TypedDict
 
+import httpx
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage, message_chunk_to_message
 from langchain_openai import ChatOpenAI
 from langgraph.config import get_stream_writer
@@ -57,11 +58,12 @@ def demo_report(state: State) -> str:
         '此结果来自本地规则演示，未调用大语言模型。')
 
 
-def build_graph(settings: Settings, tools: Tools):
+def build_graph(settings: Settings, tools: Tools, *, http_async_client: httpx.AsyncClient | None = None):
     model = None
     if settings.llm_mode == 'ark':
         model = ChatOpenAI(model=settings.ark_model, api_key=settings.ark_api_key.get_secret_value(),
-                           base_url=settings.ark_base_url, temperature=0.2, timeout=45, max_retries=1)
+                           base_url=settings.ark_base_url, temperature=0.2, timeout=45, max_retries=1,
+                           http_async_client=http_async_client)
 
     async def planner(state: State):
         steps = ['query_metrics', 'query_alerts', 'query_logs', 'search_knowledge']

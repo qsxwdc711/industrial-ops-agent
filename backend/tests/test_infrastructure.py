@@ -19,7 +19,7 @@ def test_mysql_96_shards_redis_and_optional_rabbitmq():
         shard_count=96, demo_seed=False, queue_backend=os.getenv('INFRA_QUEUE_BACKEND', 'local'),
         rabbitmq_url='amqp://industrial:industrial@localhost:5673/',
         rabbitmq_queue='industrial.test.' + uuid4().hex, cache_backend='redis',
-        redis_url='redis://localhost:6381/15', mcp_transport='stdio', aggregate_interval=3600)
+        redis_url=os.getenv('INFRA_REDIS_URL', 'redis://localhost:16381/15'), mcp_transport='stdio', aggregate_interval=3600)
     device_id = 'T-' + uuid4().hex[:8]
     storage = None
     try:
@@ -31,6 +31,9 @@ def test_mysql_96_shards_redis_and_optional_rabbitmq():
             payload = {'event_id': event_id, 'device_id': device_id, 'temperature': 86,
                        'vibration': 7.4, 'current': 22, 'pressure': .6}
             assert client.post('/api/telemetry', json=payload).status_code == 202
+            duplicate = client.post('/api/telemetry', json=payload)
+            assert duplicate.status_code == 202 and duplicate.json()['accepted'] is False
+            assert client.post('/api/telemetry', json={**payload, 'temperature': 87}).status_code == 409
             for _ in range(200):
                 if client.get(f'/api/events/{event_id}').json()['status'] == 'completed':
                     break
@@ -38,6 +41,7 @@ def test_mysql_96_shards_redis_and_optional_rabbitmq():
             else:
                 pytest.fail('Configured pipeline did not persist telemetry')
             assert client.get(f'/api/devices/{device_id}').json()['status'] == 'critical'
+            assert len(client.get(f'/api/devices/{device_id}/telemetry').json()) == 1
             overview = client.get('/api/overview').json()
             assert overview['shard_count'] == 96 and overview['telemetry_count'] >= 1
             assert client.get('/api/overview').json()['cache_hit']

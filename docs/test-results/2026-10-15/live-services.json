@@ -1,0 +1,105 @@
+{
+  "health": {
+    "status": "ok",
+    "demo_data": true,
+    "llm_mode": "ark",
+    "ark_configured": true,
+    "queue_backend": "rabbitmq",
+    "cache_backend": "redis",
+    "knowledge_backend": "milvus",
+    "mcp_transport": "stdio",
+    "shard_count": 16,
+    "aggregation_error": null,
+    "simulation_enabled": true,
+    "queue_depth": 0
+  },
+  "burst": {
+    "device_id": "QA-LOAD-e1f7d7",
+    "submitted": 64,
+    "concurrency": 8,
+    "completed": 64,
+    "unique_history_rows": 64,
+    "elapsed_including_verification_seconds": 2.954
+  },
+  "real_document_reindex": "passed",
+  "real_embedding_search": {
+    "hits": 4,
+    "citations": [
+      {
+        "title": "水泵轴承温升与振动排查指南",
+        "position": 0,
+        "retrieval": "milvus"
+      },
+      {
+        "title": "电机过热与电流异常检查流程",
+        "position": 0,
+        "retrieval": "milvus"
+      },
+      {
+        "title": "旋转设备日常巡检记录规范",
+        "position": 0,
+        "retrieval": "milvus"
+      },
+      {
+        "title": "离心泵汽蚀故障案例",
+        "position": 0,
+        "retrieval": "milvus"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "161f8c01-fe45-4c2b-9d5a-a9e295f9e061",
+      "device_id": "P-101",
+      "messages": [
+        {
+          "role": "user",
+          "mode": "ark",
+          "characters": 19,
+          "tools": []
+        },
+        {
+          "role": "assistant",
+          "mode": "ark",
+          "characters": 2003,
+          "tools": [
+            "query_metrics",
+            "query_alerts",
+            "query_logs",
+            "search_knowledge",
+            "search_knowledge"
+          ]
+        },
+        {
+          "role": "user",
+          "mode": "ark",
+          "characters": 10,
+          "tools": []
+        },
+        {
+          "role": "assistant",
+          "mode": "ark",
+          "characters": 1746,
+          "tools": [
+            "query_metrics",
+            "query_alerts",
+            "query_logs",
+            "search_knowledge"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a9837307-bdcd-4d1a-abdd-160efb5e3827",
+      "device_id": "P-101",
+      "messages": [
+        {
+          "role": "user",
+          "mode": "ark",
+          "characters": 19,
+          "tools": []
+        }
+      ]
+    }
+  ]
+}

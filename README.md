@@ -2,6 +2,8 @@
 
 首版检查结果与验证范围见 [验证记录](docs/verification-2026-10-12.md)。
 
+2026-10-15 全功能测试发现的问题已修复，修复内容和回归结果见 [修复验证](docs/fix-verification-2026-10-15.md)；修复前的失败证据见 [功能测试报告](docs/test-report-2026-10-15.md)。
+
 面向水泵、电机的 Python + React 运维工作台，连接设备数据、告警、日志、知识文档和智能分析。系统以单机开发原型实现五项功能；亿级数据、扩展分片迁移与生产部署能力需另行验证。
 
 ## 已实现的功能
@@ -61,9 +63,12 @@ LLM_MODE=ark
 ARK_API_KEY=在本机填写你的方舟APIKey
 ARK_MODEL=在方舟控制台复制ModelID或EndpointID
 ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+ARK_TRUST_ENV=false
 ```
 
 选择支持 Function Calling/工具调用的模型。API Key 只由后端读取，前端不会拿到密钥。真实模型配置缺失返回 503；模型或工具调用失败通过 SSE error 显示，不会偷偷返回规则结果。界面会显示当前模型模式。`ARK_MODEL` 的示例说明文字必须替换成控制台提供的真实 ID。
+
+聊天与嵌入请求默认直接连接方舟，避免继承失效的系统代理；如果网络必须通过代理访问方舟，设置 `ARK_TRUST_ENV=true`，再配置对应系统代理或 `HTTPS_PROXY`。该设置只影响本项目的方舟请求。
 
 ## 真实基础设施
 
@@ -80,10 +85,12 @@ DATABASE_URL=mysql+pymysql://industrial:industrial@localhost:3316/industrial?cha
 QUEUE_BACKEND=rabbitmq
 RABBITMQ_URL=amqp://industrial:industrial@localhost:5673/
 CACHE_BACKEND=redis
-REDIS_URL=redis://localhost:6381/0
+REDIS_URL=redis://localhost:16381/0
 ```
 
 RabbitMQ 管理界面位于 [本地管理界面](http://127.0.0.1:15673)，开发账号为 `industrial / industrial`。Compose 创建独立的项目服务和数据卷，不复用电脑上已有的数据库。开发密码仅用于本机原型。
+
+Redis 宿主端口默认 16381，避开部分 Windows 环境保留的 6381。可以在根目录 `.env` 设置 `REDIS_PORT` 更换端口，并同步本地后端的 `REDIS_URL`；容器后端仍连接 `redis:6379`。已有 6381 配置升级时，更新 `backend/.env` 并运行 `docker compose up -d redis` 重建端口映射，原数据卷保留。使用其他现有镜像时可设置 `REDIS_IMAGE`，例如 `redis:latest`；已有高版本 Redis 数据卷应继续使用兼容镜像，避免降级读取。
 
 ### RabbitMQ 镜像下载失败时
 
@@ -153,7 +160,7 @@ EMBEDDING_DIMENSION=模型实际返回的维度
 {"event_id":"gateway-sample-001","device_id":"P-109","temperature":62.5,"vibration":2.1,"current":21.8,"pressure":0.55,"ambient_temperature":26.4,"humidity":58,"source":"device-gateway"}
 ```
 
-接口返回 202，使用 `GET /api/events/{event_id}` 检查是否完成。未给 timestamp 时使用当前 UTC 时间；指定时需携带时区。同一 event_id 同一内容会去重，若内容冲突则返回 409。遥测中的较旧采样只进入历史，不覆盖设备最新状态。温度和振动阈值是演示规则，实际设备需依据规格配置。
+接口返回 202，使用 `GET /api/events/{event_id}` 检查是否完成。未给 timestamp 时使用首次接收的 UTC 时间，省略时间戳的相同重试沿用该时间；指定时需携带时区。同一 event_id 同一内容会去重，若内容冲突（包括显式指定不同时间戳）则返回 409。遥测中的较旧采样只进入历史，不覆盖设备最新状态。温度和振动阈值是演示规则，实际设备需依据规格配置。
 
 `POST /api/logs` 接入日志：
 

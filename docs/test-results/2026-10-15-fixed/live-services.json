@@ -1,0 +1,75 @@
+{
+  "health": {
+    "status": "ok",
+    "demo_data": true,
+    "llm_mode": "ark",
+    "ark_configured": true,
+    "queue_backend": "rabbitmq",
+    "cache_backend": "redis",
+    "knowledge_backend": "milvus",
+    "mcp_transport": "stdio",
+    "shard_count": 16,
+    "aggregation_error": null,
+    "simulation_enabled": true,
+    "queue_depth": 0
+  },
+  "environment": {
+    "system_proxy_present": true,
+    "NO_PROXY_set": false,
+    "ARK_TRUST_ENV": false,
+    "redis_url_uses_fixed_port": true
+  },
+  "retry": {
+    "concurrency": 8,
+    "identical_submissions": 16,
+    "accepted_once": true,
+    "history_rows": 1,
+    "equivalent_explicit_timestamp": "deduplicated",
+    "changed_explicit_timestamp": 409,
+    "changed_value": 409
+  },
+  "blank_question": 422,
+  "blank_log": 422,
+  "sessions": [
+    {
+      "id": "4fe6bd9a-d7da-42e8-9954-31ac8d74d3e0",
+      "device_id": "P-101",
+      "messages": [
+        {
+          "role": "user",
+          "mode": "ark",
+          "characters": 19,
+          "tools": []
+        },
+        {
+          "role": "assistant",
+          "mode": "ark",
+          "characters": 2229,
+          "tools": [
+            "query_metrics",
+            "query_alerts",
+            "query_logs",
+            "search_knowledge"
+          ]
+        },
+        {
+          "role": "user",
+          "mode": "ark",
+          "characters": 10,
+          "tools": []
+        },
+        {
+          "role": "assistant",
+          "mode": "ark",
+          "characters": 2189,
+          "tools": [
+            "query_metrics",
+            "query_alerts",
+            "query_logs",
+            "search_knowledge"
+          ]
+        }
+      ]
+    }
+  ]
+}

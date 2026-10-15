@@ -1918,6 +1918,11 @@ tbody tr:hover {
     flex-wrap: wrap;
     gap: 14px;
   }
+  .heading-actions {
+    max-width: 100%;
+    flex-wrap: wrap;
+    flex-shrink: 1;
+  }
   .page-heading h1 {
     font-size: 22px;
   }

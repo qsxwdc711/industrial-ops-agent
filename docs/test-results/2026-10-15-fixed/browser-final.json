@@ -1,0 +1,184 @@
+{
+  "health": {
+    "status": "ok",
+    "demo_data": true,
+    "llm_mode": "ark",
+    "ark_configured": true,
+    "queue_backend": "rabbitmq",
+    "cache_backend": "redis",
+    "knowledge_backend": "milvus",
+    "mcp_transport": "stdio",
+    "shard_count": 16,
+    "aggregation_error": null,
+    "simulation_enabled": true,
+    "queue_depth": 0
+  },
+  "results": [
+    {
+      "name": "overview statistics and temperature/vibration chart",
+      "status": "passed",
+      "ms": 948
+    },
+    {
+      "name": "device filters, area search and empty result",
+      "status": "passed",
+      "ms": 590
+    },
+    {
+      "name": "register motor and show offline details",
+      "status": "passed",
+      "ms": 840
+    },
+    {
+      "name": "duplicate registration surfaces server conflict",
+      "status": "passed",
+      "ms": 853
+    },
+    {
+      "name": "alert status filters, search and device analysis shortcut",
+      "status": "passed",
+      "ms": 658
+    },
+    {
+      "name": "knowledge .md file import, category and original content",
+      "status": "passed",
+      "ms": 2090
+    },
+    {
+      "name": "knowledge oversized upload is rejected",
+      "status": "passed",
+      "ms": 540
+    },
+    {
+      "name": "knowledge delete cancel preserves document; accept removes it",
+      "status": "passed",
+      "ms": 1319
+    },
+    {
+      "name": "saved real diagnosis and follow-up reload with evidence",
+      "status": "passed",
+      "ms": 2431
+    },
+    {
+      "name": "assistant keyboard and explicit SSE error handling (injected response)",
+      "status": "passed",
+      "ms": 727
+    },
+    {
+      "name": "assistant cancellation releases UI (injected delayed request)",
+      "status": "passed",
+      "ms": 590
+    },
+    {
+      "name": "backend outage shows reconnect and recovers (injected HTTP failure)",
+      "status": "passed",
+      "ms": 696
+    },
+    {
+      "name": "运行总览: no page overflow at 320px",
+      "status": "passed",
+      "ms": 448
+    },
+    {
+      "name": "设备管理: no page overflow at 320px",
+      "status": "passed",
+      "ms": 607
+    },
+    {
+      "name": "监控告警: no page overflow at 320px",
+      "status": "passed",
+      "ms": 474
+    },
+    {
+      "name": "运维知识库: no page overflow at 320px",
+      "status": "passed",
+      "ms": 481
+    },
+    {
+      "name": "智能运维助手: no page overflow at 320px",
+      "status": "passed",
+      "ms": 481
+    },
+    {
+      "name": "运行总览: no page overflow at 390px",
+      "status": "passed",
+      "ms": 518
+    },
+    {
+      "name": "设备管理: no page overflow at 390px",
+      "status": "passed",
+      "ms": 558
+    },
+    {
+      "name": "监控告警: no page overflow at 390px",
+      "status": "passed",
+      "ms": 628
+    },
+    {
+      "name": "运维知识库: no page overflow at 390px",
+      "status": "passed",
+      "ms": 590
+    },
+    {
+      "name": "智能运维助手: no page overflow at 390px",
+      "status": "passed",
+      "ms": 554
+    },
+    {
+      "name": "运行总览: no page overflow at 768px",
+      "status": "passed",
+      "ms": 456
+    },
+    {
+      "name": "设备管理: no page overflow at 768px",
+      "status": "passed",
+      "ms": 477
+    },
+    {
+      "name": "监控告警: no page overflow at 768px",
+      "status": "passed",
+      "ms": 453
+    },
+    {
+      "name": "运维知识库: no page overflow at 768px",
+      "status": "passed",
+      "ms": 449
+    },
+    {
+      "name": "智能运维助手: no page overflow at 768px",
+      "status": "passed",
+      "ms": 471
+    },
+    {
+      "name": "运行总览: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 409
+    },
+    {
+      "name": "设备管理: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 451
+    },
+    {
+      "name": "监控告警: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 421
+    },
+    {
+      "name": "运维知识库: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 448
+    },
+    {
+      "name": "智能运维助手: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 523
+    },
+    {
+      "name": "no uncaught browser runtime errors",
+      "status": "passed",
+      "ms": 1
+    }
+  ],
+  "runtimeErrors": []
+}

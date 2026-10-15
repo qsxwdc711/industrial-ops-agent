@@ -132,14 +132,18 @@ class Storage:
             return bool(conn.scalar(select(self.devices.c.id).where(self.devices.c.demo == 1).limit(1)))
 
     def accept(self, item: Telemetry) -> bool:
+        payload = item.model_dump(mode='json')
         with self.engine.begin() as conn:
             try:
                 conn.execute(insert(self.inbox).values(event_id=item.event_id, device_id=item.device_id,
-                    payload=item.model_dump(mode='json'), status='pending', attempts=0, updated_at=utcnow()))
+                    payload=payload, status='pending', attempts=0, updated_at=utcnow()))
                 return True
             except IntegrityError:
                 existing = conn.scalar(select(self.inbox.c.payload).where(self.inbox.c.event_id == item.event_id))
-                if existing != item.model_dump(mode='json'):
+                # A retry without a client timestamp keeps the first receipt time.
+                if existing is not None and 'timestamp' not in item.model_fields_set:
+                    payload['timestamp'] = existing['timestamp']
+                if existing != payload:
                     raise ValueError('event_id 已被不同数据使用')
                 return False
 

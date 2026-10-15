@@ -1,0 +1,186 @@
+{
+  "health": {
+    "status": "ok",
+    "demo_data": true,
+    "llm_mode": "ark",
+    "ark_configured": true,
+    "queue_backend": "rabbitmq",
+    "cache_backend": "redis",
+    "knowledge_backend": "milvus",
+    "mcp_transport": "stdio",
+    "shard_count": 16,
+    "aggregation_error": null,
+    "simulation_enabled": true,
+    "queue_depth": 0
+  },
+  "results": [
+    {
+      "name": "overview statistics and temperature/vibration chart",
+      "status": "passed",
+      "ms": 1394
+    },
+    {
+      "name": "device filters, area search and empty result",
+      "status": "passed",
+      "ms": 725
+    },
+    {
+      "name": "register motor and show offline details",
+      "status": "passed",
+      "ms": 840
+    },
+    {
+      "name": "duplicate registration surfaces server conflict",
+      "status": "passed",
+      "ms": 1012
+    },
+    {
+      "name": "alert status filters, search and device analysis shortcut",
+      "status": "passed",
+      "ms": 1643
+    },
+    {
+      "name": "knowledge .md file import, category and original content",
+      "status": "passed",
+      "ms": 3512
+    },
+    {
+      "name": "knowledge oversized upload is rejected",
+      "status": "passed",
+      "ms": 742
+    },
+    {
+      "name": "knowledge delete cancel preserves document; accept removes it",
+      "status": "passed",
+      "ms": 1314
+    },
+    {
+      "name": "saved real diagnosis and follow-up reload with evidence",
+      "status": "failed",
+      "ms": 10570,
+      "error": "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.chat-message.assistant').first() to be visible\u001b[22m\n"
+    },
+    {
+      "name": "assistant keyboard and explicit SSE error handling (injected response)",
+      "status": "passed",
+      "ms": 779
+    },
+    {
+      "name": "assistant cancellation releases UI (injected delayed request)",
+      "status": "passed",
+      "ms": 611
+    },
+    {
+      "name": "backend outage shows reconnect and recovers (injected HTTP failure)",
+      "status": "passed",
+      "ms": 618
+    },
+    {
+      "name": "运行总览: no page overflow at 320px",
+      "status": "passed",
+      "ms": 453
+    },
+    {
+      "name": "设备管理: no page overflow at 320px",
+      "status": "failed",
+      "ms": 503,
+      "error": "{\"content\":368,\"viewport\":320}"
+    },
+    {
+      "name": "监控告警: no page overflow at 320px",
+      "status": "passed",
+      "ms": 504
+    },
+    {
+      "name": "运维知识库: no page overflow at 320px",
+      "status": "passed",
+      "ms": 485
+    },
+    {
+      "name": "智能运维助手: no page overflow at 320px",
+      "status": "passed",
+      "ms": 555
+    },
+    {
+      "name": "运行总览: no page overflow at 390px",
+      "status": "passed",
+      "ms": 547
+    },
+    {
+      "name": "设备管理: no page overflow at 390px",
+      "status": "passed",
+      "ms": 579
+    },
+    {
+      "name": "监控告警: no page overflow at 390px",
+      "status": "passed",
+      "ms": 587
+    },
+    {
+      "name": "运维知识库: no page overflow at 390px",
+      "status": "passed",
+      "ms": 717
+    },
+    {
+      "name": "智能运维助手: no page overflow at 390px",
+      "status": "passed",
+      "ms": 596
+    },
+    {
+      "name": "运行总览: no page overflow at 768px",
+      "status": "passed",
+      "ms": 448
+    },
+    {
+      "name": "设备管理: no page overflow at 768px",
+      "status": "passed",
+      "ms": 454
+    },
+    {
+      "name": "监控告警: no page overflow at 768px",
+      "status": "passed",
+      "ms": 453
+    },
+    {
+      "name": "运维知识库: no page overflow at 768px",
+      "status": "passed",
+      "ms": 487
+    },
+    {
+      "name": "智能运维助手: no page overflow at 768px",
+      "status": "passed",
+      "ms": 453
+    },
+    {
+      "name": "运行总览: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 445
+    },
+    {
+      "name": "设备管理: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 454
+    },
+    {
+      "name": "监控告警: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 438
+    },
+    {
+      "name": "运维知识库: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 451
+    },
+    {
+      "name": "智能运维助手: no page overflow at 1440px",
+      "status": "passed",
+      "ms": 516
+    },
+    {
+      "name": "no uncaught browser runtime errors",
+      "status": "passed",
+      "ms": 3
+    }
+  ],
+  "runtimeErrors": []
+}

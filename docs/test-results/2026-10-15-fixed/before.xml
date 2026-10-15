@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="8.119" timestamp="2026-10-15T14:22:39.566770+08:00" hostname="death7"><testcase classname="tests.test_acceptance" name="test_repeated_event_without_explicit_timestamp_is_idempotent" time="0.661"><failure message="AssertionError: {&quot;detail&quot;:&quot;event_id 已被不同数据使用&quot;}&#10;assert 409 == 202&#10; +  where 409 = &lt;Response [409 Conflict]&gt;.status_code">client = &lt;starlette.testclient.TestClient object at 0x00000229AA994AA0&gt;
+
+    def test_repeated_event_without_explicit_timestamp_is_idempotent(client):
+        """A gateway retry of an identical JSON body must not become a different event."""
+        data = sample()
+        del data['timestamp']
+        assert client.post('/api/telemetry', json=data).status_code == 202
+        second = client.post('/api/telemetry', json=data)
+&gt;       assert second.status_code == 202, second.text
+E       AssertionError: {"detail":"event_id 已被不同数据使用"}
+E       assert 409 == 202
+E        +  where 409 = &lt;Response [409 Conflict]&gt;.status_code
+
+tests\test_acceptance.py:294: AssertionError</failure></testcase><testcase classname="tests.test_acceptance" name="test_whitespace_only_question_is_rejected" time="0.545"><failure message="AssertionError: event: session&#10;  data: {&quot;session_id&quot;: &quot;7126e89a-3292-4f5a-8493-d5c4a9cdc29c&quot;, &quot;mode&quot;: &quot;demo&quot;}&#10;  &#10;  event: step&#10;  data: {&quot;type&quot;: &quot;step&quot;, &quot;agent&quot;: &quot;任务规划智能体&quot;, &quot;message&quot;: &quot;已制定证据查询计划&quot;, &quot;plan&quot;: [&quot;query_metrics&quot;, &quot;query_alerts&quot;, &quot;query_logs&quot;, &quot;search_knowledge&quot;]}&#10;  &#10;  event: step&#10;  data: {&quot;type&quot;: &quot;step&quot;, &quot;agent&quot;: &quot;指标查询&quot;&#10;assert 200 == 422&#10; +  where 200 = &lt;Response [200 OK]&gt;.status_code">client = &lt;starlette.testclient.TestClient object at 0x00000229AA9B9310&gt;
+
+    def test_whitespace_only_question_is_rejected(client):
+        response = client.post('/api/analysis', json={'device_id': 'QA-P', 'question': '   '})
+&gt;       assert response.status_code == 422, response.text[:300]
+E       AssertionError: event: session
+E         data: {"session_id": "7126e89a-3292-4f5a-8493-d5c4a9cdc29c", "mode": "demo"}
+E
+E         event: step
+E         data: {"type": "step", "agent": "任务规划智能体", "message": "已制定证据查询计划", "plan": ["query_metrics", "query_alerts", "query_logs", "search_knowledge"]}
+E
+E         event: step
+E         data: {"type": "step", "agent": "指标查询"
+E       assert 200 == 422
+E        +  where 200 = &lt;Response [200 OK]&gt;.status_code
+
+tests\test_acceptance.py:300: AssertionError</failure></testcase><testcase classname="tests.test_acceptance" name="test_whitespace_only_log_message_is_rejected" time="0.367"><failure message="AssertionError: {&quot;saved&quot;:true}&#10;assert 201 == 422&#10; +  where 201 = &lt;Response [201 Created]&gt;.status_code">client = &lt;starlette.testclient.TestClient object at 0x00000229AB215130&gt;
+
+    def test_whitespace_only_log_message_is_rejected(client):
+        response = client.post('/api/logs', json={'device_id': 'QA-P', 'message': '   '})
+&gt;       assert response.status_code == 422, response.text
+E       AssertionError: {"saved":true}
+E       assert 201 == 422
+E        +  where 201 = &lt;Response [201 Created]&gt;.status_code
+
+tests\test_acceptance.py:305: AssertionError</failure></testcase></testsuite></testsuites>

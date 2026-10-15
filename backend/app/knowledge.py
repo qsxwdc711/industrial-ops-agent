@@ -61,7 +61,7 @@ class Knowledge:
         api = self.settings.ark_embedding_api
         multimodal = api == 'multimodal' or (
             api == 'auto' and self.settings.ark_embedding_model.startswith('doubao-embedding-vision'))
-        async with httpx.AsyncClient(timeout=60, trust_env=False) as client:
+        async with httpx.AsyncClient(timeout=60, trust_env=self.settings.ark_trust_env) as client:
             async def request(endpoint, payload):
                 response = await client.post(self.settings.ark_base_url.rstrip('/') + endpoint,
                     headers={'Authorization': 'Bearer ' + self.settings.ark_api_key.get_secret_value()},
